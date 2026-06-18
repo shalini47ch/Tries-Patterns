@@ -322,12 +322,85 @@ class Solution:
         return ans
 
 
+```
 
+## Question Phone Directory (Same patterns trie+prefix dfs)
+Python Implementation
+
+```
+#User function Template for python3
+class Node:
+    def __init__(self):
+        self.links=[None for i in range(26)]
+        self.flag=False 
+    
+    def containsKey(self,ch):
+        return self.links[ord(ch)-ord("a")]!=None 
+    
+    def put(self,ch):
+        self.links[ord(ch)-ord("a")]=Node()
+    
+    def get(self,ch):
+        return self.links[ord(ch)-ord("a")]
+    
+    def setEnd(self):
+        self.flag=True 
+    
+    def isEnd(self):
+        return self.flag
+
+#similarly create a trie
+class Trie:
+    def __init__(self):
+        self.root=Node()
+    
+    def insert(self,word):
+        node=self.root 
+        for i in range(0,len(word)):
+            if not node.containsKey(word[i]):
+                node.put(word[i])
+            node=node.get(word[i])
+        node.setEnd()
         
-
-
-
-
+class Solution:
+    def dfs(self,node,path,res):
+        if(node.isEnd()):
+            res.append(path)
+        for i in range(0,26):
+            if(node.links[i]):
+                self.dfs(node.links[i],path+chr(i+97),res)
+        
+    #now similarly create a helper to form the search suggestions 
+    def getWords(self,trie,prefix):
+        node=trie.root 
+        res=[]
+        for ch in prefix:
+            if not node.containsKey(ch):
+                return []
+            node=node.get(ch)
+        #here we are perfoming autosuggestions logic from using dfs from prefix
+        self.dfs(node,prefix,res)
+        return sorted(res) #as we need it in lexicographically increasing order 
+    
+    def displayContacts(self, n, contact, s):
+        # code here
+        #this is exactly the same question as that of search suggestion system
+        #based on the concept of trie+prefix dfs
+        trie=Trie()
+        #insert the elements of the contact in trie
+        for ele in contact:
+            trie.insert(ele)
+        prefix=""
+        ans=[]
+        for ch in s:
+            prefix+=ch
+            res=self.getWords(trie,prefix)
+            if(len(res)==0):
+                ans.append(["0"])
+            else:
+                ans.append(res)
+        return ans
+        
 ```
 
 
