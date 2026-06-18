@@ -183,5 +183,152 @@ class WordDictionary:
 # param_2 = obj.search(word)
 ```
 
+# Pattern 3: Trie + DFS (Search Suggestions / Autocomplete)
+
+## Problem Statement Identification
+
+Look for keywords:
+
+* Search Suggestions
+* Autocomplete
+* Phone Directory
+* Contacts Suggestions
+* Prefix Recommendations
+
+Typical statement:
+
+> Given a list of words and a prefix, return matching words in lexicographical order.
+
+---
+
+## Core Tactic & Intuition
+
+A Trie naturally groups words by prefixes.
+
+Instead of scanning all words:
+
+```text
+Reach Prefix Node
++
+DFS Subtree
+=
+All Suggestions
+```
+
+Example:
+
+```text
+Products:
+mobile
+mouse
+mousepad
+monitor
+
+Prefix:
+mou
+
+Output:
+mouse
+mousepad
+```
+
+---
+
+### LeetCode
+
+* LC 1268 — Search Suggestions System
+
+### GFG
+
+* Phone Directory
+* Contacts Suggestions
+
+---
+
+## Recognition Rule
+
+```text
+Prefix + Suggestions
+=
+Trie + DFS
+```
+
+## Python Implementation
+
+```
+class Node:
+    def __init__(self):
+        self.links=[None for i in range(26)]
+        self.flag=False 
+    
+    def containsKey(self,ch):
+        return self.links[ord(ch)-ord("a")]!=None 
+    
+    def get(self,ch):
+        return self.links[ord(ch)-ord("a")]
+    
+    def put(self,ch):
+        self.links[ord(ch)-ord("a")]=Node()
+    
+    def setEnd(self):
+        self.flag=True 
+    
+    def isEnd(self):
+        return self.flag
+    
+class Trie:
+    def __init__(self):
+        self.root=Node()
+    
+    def insert(self,word):
+        node=self.root 
+        for i in range(0,len(word)):
+            if not node.containsKey(word[i]):
+                node.put(word[i])
+            node=node.get(word[i])
+        node.setEnd()
+
+class Solution:
+    def dfs(self,node,path,res):
+        if(len(res)==3):
+            return 
+        if node.isEnd():
+            res.append(path)
+        for i in range(26):
+            if(node.links[i]):
+                self.dfs(node.links[i],path+chr(i+97),res)
+    
+    def getSuggestions(self,trie,prefix):
+        node=trie.root 
+        for ch in prefix:
+            if not node.containsKey(ch):
+                return []
+            node=node.get(ch) #this is the one from where we will do dfs
+        res=[]
+        self.dfs(node,prefix,res)
+        return res
+
+    def suggestedProducts(self, products: List[str], searchWord: str) -> List[List[str]]:
+        #now build trie and perform the search suggstions 
+        trie=Trie()
+        ans=[]
+        #insert in the trie all the products
+        for ch in products:
+            trie.insert(ch)
+        prefix=""
+        for ch in searchWord:
+            prefix+=ch
+            ans.append(self.getSuggestions(trie,prefix))
+        return ans
+
+
+
+        
+
+
+
+
+```
+
 
        
